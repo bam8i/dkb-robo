@@ -72,19 +72,23 @@ class DKBRobo(object):
         """
         self.logout()
 
-    def get_account_transactions(self, transaction_url, date_from, date_to):
+    def get_account_transactions(self, transaction_url, date_from, date_to, transaction_type='booked'):
         """ get transactions from an regular account for a certain amount of time
         args:
             self.dkb_br          - browser object
             transaction_url - link to collect the transactions
             date_from       - transactions starting form
             date_to         - end date
+            transaction_type- booked or reserved
         """
         print_debug(self.debug, 'DKBRobo.get_account_transactions({0}: {1}/{2})\n'.format(transaction_url, date_from, date_to))
         self.dkb_br.open(transaction_url)
         self.dkb_br.select_form('#form1615473160_1')
 
-        self.dkb_br["slTransactionStatus"] = 0
+        if transaction_type='booked':
+            self.dkb_br["slTransactionStatus"] = 0
+        elif transaction_type='reserved':
+            self.dkb_br["slTransactionStatus"] = 1           
         self.dkb_br["searchPeriodRadio"] = 1
         self.dkb_br["slSearchPeriod"] = 1
         self.dkb_br["transactionDate"] = str(date_from)
@@ -411,7 +415,7 @@ class DKBRobo(object):
 
         return so_list
 
-    def get_transactions(self, transaction_url, atype, date_from, date_to):
+    def get_transactions(self, transaction_url, atype, date_from, date_to, transaction_type='booked'):
         """ get transactions for a certain amount of time
         args:
             self.dkb_br          - browser object
@@ -429,7 +433,7 @@ class DKBRobo(object):
         print_debug(self.debug, 'DKBRobo.get_account_transactions({0}/{1}: {2}/{3})\n'.format(transaction_url, atype, date_from, date_to))
         transaction_list = []
         if atype == 'account':
-            transaction_list = self.get_account_transactions(transaction_url, date_from, date_to)
+            transaction_list = self.get_account_transactions(transaction_url, date_from, date_to, transaction_type)
         elif atype == 'creditcard':
             transaction_list = self.get_creditcard_transactions(transaction_url, date_from, date_to)
 
